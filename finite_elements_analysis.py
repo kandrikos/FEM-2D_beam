@@ -63,40 +63,42 @@ class FiniteElementsAnalysis:
             self.elem_dofs.append(dofs)
         self.elem_dofs = np.array(self.elem_dofs) - 1
 
+
+    def local_stiffness_matrix(self, E):
+        """
+        Calculates the stiffness matrix of a quadrilateral element
+        """
+        a = self.lenX / (2 * self.n_elemX)
+        b = self.lenY / (2 * self.n_elemY)
+        r = a/b
+        rho = (1 - self.poisson)/2
+        mu = (1 + self.poisson) * 3/2
+        lamda = (1 - 3*self.poisson)/2
+
+        k = np.zeros((8, 8))
+
+        k[0, 0] = k[2, 2] = k[4, 4] = k[6, 6] = 4/r + 4*rho*r
+        k[1, 1] = k[3, 3] = k[5, 5] = k[7, 7] = 4*r + 4*rho/r
+        k[2, 0] = k[0, 2] = k[6, 4] = k[4, 6] = -4/r + 2*rho*r
+        k[4, 0] = k[0, 4] = k[6, 2] = k[2, 6] = -2/r - 2*rho*r
+        k[6, 0] = k[0, 6] = k[4, 2] = k[2, 4] = 2/r - 4*rho*r
+        k[3, 1] = k[1, 3] = k[7, 5] = k[5, 7] = 2*r - 4*rho/r
+        k[5, 1] = k[1, 5] = k[7, 3] = k[3, 7] = -2*r - 2*rho/r
+        k[7, 1] = k[1, 7] = k[5, 3] = k[3, 5] = -4*r + 2*rho/r
+        k[1, 0] = k[0, 1] = k[7, 2] = k[2, 7] = k[6,3] = k[3, 6] = k[5, 4] = k[4, 5] = mu
+        k[3, 0] = k[0, 3] = k[6, 1] = k[1, 6] = k[5,2] = k[2, 5] = k[7, 4] = k[4, 7] = -lamda
+        k[5, 0] = k[0, 5] = k[4, 1] = k[1, 4] = k[3,2] = k[2, 3] = k[7, 6] = k[6, 7] = -mu
+        k[7, 0] = k[0, 7] = k[1, 2] = k[2, 1] = k[4,3] = k[3, 4] = k[6, 5] = k[5, 6] = lamda
+
+        return E * self.thickness / (12 * (1 - self.poisson**2)) * k
     
+
     def get_element_global_stiffness(self, element_dof, E):
         """
         For a given element (defined by its dofs) the method returns its global stiffness matrix
         """
-        def local_stiffness_matrix(self):
-            """
-            Calculates the stiffness matrix of a quadrilateral element
-            """
-            a = self.lenX / (2 * self.n_elemX)
-            b = self.lenY / (2 * self.n_elemY)
-            r = a/b
-            rho = (1 - self.poisson)/2
-            mu = (1 + self.poisson) * 3/2
-            lamda = (1 - 3*self.poisson)/2
 
-            k = np.zeros((8, 8))
-
-            k[0, 0] = k[2, 2] = k[4, 4] = k[6, 6] = 4/r + 4*rho*r
-            k[1, 1] = k[3, 3] = k[5, 5] = k[7, 7] = 4*r + 4*rho/r
-            k[2, 0] = k[0, 2] = k[6, 4] = k[4, 6] = -4/r + 2*rho*r
-            k[4, 0] = k[0, 4] = k[6, 2] = k[2, 6] = -2/r - 2*rho*r
-            k[6, 0] = k[0, 6] = k[4, 2] = k[2, 4] = 2/r - 4*rho*r
-            k[3, 1] = k[1, 3] = k[7, 5] = k[5, 7] = 2*r - 4*rho/r
-            k[5, 1] = k[1, 5] = k[7, 3] = k[3, 7] = -2*r - 2*rho/r
-            k[7, 1] = k[1, 7] = k[5, 3] = k[3, 5] = -4*r + 2*rho/r
-            k[1, 0] = k[0, 1] = k[7, 2] = k[2, 7] = k[6,3] = k[3, 6] = k[5, 4] = k[4, 5] = mu
-            k[3, 0] = k[0, 3] = k[6, 1] = k[1, 6] = k[5,2] = k[2, 5] = k[7, 4] = k[4, 7] = -lamda
-            k[5, 0] = k[0, 5] = k[4, 1] = k[1, 4] = k[3,2] = k[2, 3] = k[7, 6] = k[6, 7] = -mu
-            k[7, 0] = k[0, 7] = k[1, 2] = k[2, 1] = k[4,3] = k[3, 4] = k[6, 5] = k[5, 6] = lamda
-
-            return E * self.thickness / (12 * (1 - self.poisson**2)) * k
-
-        k_element_local = local_stiffness_matrix(self)
+        k_element_local = self.local_stiffness_matrix(E)
         self.k_element_glob = np.zeros((self.g_dofs, self.g_dofs))
         c1 = 0
         for i in element_dof:
