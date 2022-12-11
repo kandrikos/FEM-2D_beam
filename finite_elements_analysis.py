@@ -32,11 +32,8 @@ class FiniteElementsAnalysis:
         j = 1
         i = 1
         i1 = 0
-        counter = 0
-
         for j in range(self.n_elemY):
             for i in range(self.n_elemX):
-                counter += 1
                 if i == 0 and j == 0:
                     i1 = 1
                 else:
