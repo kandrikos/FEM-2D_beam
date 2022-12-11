@@ -142,7 +142,7 @@ class FiniteElementsAnalysis:
         # self.forces[-2] = -5 * load
         # self.forces[-int((2*self.n_elemX + 1) / 2) + 1] = -load  # the load is applied to the middle-point of the upper surface - direction to negative y
 
-    def get_displacements(self):
+    def get_displacements(self, flag=False):
         """
         Returns the displacement field
         """
@@ -154,8 +154,10 @@ class FiniteElementsAnalysis:
         # Compute the displacement vector
         self.displacements = np.dot(np.linalg.inv(self.global_stiffness), self.forces)  # U = K^-1 * P
         self.displacements = self.displacements.reshape(self.n_elemY + 1, self.n_elemX + 1, 2)
-        print(f"Displacement of the bottom right corner of the beam (m):\n{self.displacements[0][-1][1]}")
-
+        if flag == False:
+            print(f"Displacement of the bottom right corner of the beam (m):\n{self.displacements[0][-1][1]}")
+        else:
+            return self.displacements[0][-1][1]
 
     def mesh_plot(self):
 

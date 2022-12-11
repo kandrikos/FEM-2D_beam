@@ -25,7 +25,6 @@ class MonteCarloSimulation(FiniteElementsAnalysis):
         return np.random.normal(10, 2, self.n_simulations)
 
     def run_MonteCarlo(self):
-
         right_bottom_node_dispY = []
         E_kl = self.karhunen_loeve()
         loads = self.get_load()
@@ -34,29 +33,18 @@ class MonteCarloSimulation(FiniteElementsAnalysis):
             realization = E_kl[r]
 
             el = 0
-            global_stiffness = np.zeros((self.g_dofs, self.g_dofs))
+            self.global_stiffness = np.zeros((self.g_dofs, self.g_dofs))
             for el, i in enumerate(itertools.cycle(range(len(realization)))):
                 
                 k_element_global = self.get_element_global_stiffness(element_dof=self.elem_dofs[el], E=realization[i])
-                global_stiffness += k_element_global
+                self.global_stiffness += k_element_global
                 if el == self.elem_dofs.shape[0] - 1:
                     break
             
             self.set_boundary_conditions()
             self.set_force_vector(load=loads[r])
-
-
-            for i in self.constrained_dofs:          # For each constrained dof i, set the elements of i-row & i-column
-                global_stiffness[:, i] = 0           # of the global stiffness matrix to zero
-                global_stiffness[i, :] = 0           # Assign a very large positive number to the i-diagonal element
-                global_stiffness[i, i] = 1e10
-
-            # Compute the displacement vector
-            self.displacements = np.dot(np.linalg.inv(global_stiffness), self.forces)  # U = K^-1 * P
-            self.displacements = self.displacements.reshape(self.n_elemY + 1, self.n_elemX + 1, 2)
-            right_bottom_node_dispY.append((self.displacements[0][-1][1]))
-
-
+            node_displacement = self.get_displacements(flag=True)
+            right_bottom_node_dispY.append(node_displacement)
         sns.distplot(right_bottom_node_dispY, bins=10)
         plt.xlabel("Displacement")
         plt.ylabel("Density")
@@ -66,7 +54,7 @@ class MonteCarloSimulation(FiniteElementsAnalysis):
                 f.write("%s\n" % item)
 
 if __name__ == '__main__':
-    mc = MonteCarloSimulation(n_elemX=40, n_elemY=10, lenX=4, lenY=1, poisson=0.3, thickness=0.2, n_simulations=1000)
+    mc = MonteCarloSimulation(n_elemX=40, n_elemY=10, lenX=4, lenY=1, poisson=0.3, thickness=0.2, n_simulations=100)
       
     mc.rectangular_mesh()
     mc.get_dofs()
