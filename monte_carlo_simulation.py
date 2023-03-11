@@ -51,5 +51,5 @@ class MonteCarloSimulation(FiniteElementsAnalysis):
         plt.savefig(os.path.join(os.getcwd(), f"PDF_{self.n_simulations}_simulations.png"))
 
 if __name__ == '__main__':
-    mc = MonteCarloSimulation(n_simulations=10, **arguments.shared_args)
+    mc = MonteCarloSimulation(n_simulations=arguments.n_simulations, **arguments.shared_args)
     mc.run_MonteCarlo()
