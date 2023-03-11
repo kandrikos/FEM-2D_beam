@@ -12,7 +12,6 @@ from matplotlib.collections import LineCollection
 class FiniteElementsAnalysis:
 
     def __init__(self, lenX, lenY, n_elemX, n_elemY, poisson, thickness):
-
         self.lenX = lenX
         self.lenY = lenY
         self.n_elemX = n_elemX
