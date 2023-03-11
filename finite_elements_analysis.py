@@ -13,12 +13,12 @@ class FiniteElementsAnalysis:
 
     def __init__(self, lenX, lenY, n_elemX, n_elemY, poisson, thickness):
 
-        self.lenX = lenX                     # length of the beam
-        self.lenY = lenY                     # hight of the beam
-        self.n_elemX = n_elemX               # number of elements along x-axis
-        self.n_elemY = n_elemY               # number of elements along y-axis
-        self.poisson = poisson               # poisson ratio
-        self.thickness = thickness           # thickness of beam
+        self.lenX = lenX
+        self.lenY = lenY
+        self.n_elemX = n_elemX
+        self.n_elemY = n_elemY
+        self.poisson = poisson
+        self.thickness = thickness
         self.element_nodes = []
         self.elem_dofs = []
         self.g_dofs = 2 * (n_elemX + 1) * (n_elemY + 1) # global degrees of freedom
@@ -28,7 +28,6 @@ class FiniteElementsAnalysis:
         Method for discretizing the domain using quadrilateral elements. Returns a 2d list of shape (num_of_elements, 4)
         (from book 'MATLAB Codes for Finite Element Analysis' by Ferreira, António J. M., Fantuzzi, Nicholas)
         """
-
         j = 1
         i = 1
         i1 = 0
@@ -46,8 +45,6 @@ class FiniteElementsAnalysis:
             i2 += 1
         self.element_nodes = np.array(self.element_nodes)
 
-
-
     def get_dofs(self):
         '''
         Returns a list with the dofs of an element
@@ -59,7 +56,6 @@ class FiniteElementsAnalysis:
                 dofs.append(2*i)
             self.elem_dofs.append(dofs)
         self.elem_dofs = np.array(self.elem_dofs) - 1
-
 
     def local_stiffness_matrix(self, E):
         """
@@ -73,7 +69,6 @@ class FiniteElementsAnalysis:
         lamda = (1 - 3*self.poisson)/2
 
         k = np.zeros((8, 8))
-
         k[0, 0] = k[2, 2] = k[4, 4] = k[6, 6] = 4/r + 4*rho*r
         k[1, 1] = k[3, 3] = k[5, 5] = k[7, 7] = 4*r + 4*rho/r
         k[2, 0] = k[0, 2] = k[6, 4] = k[4, 6] = -4/r + 2*rho*r
@@ -88,13 +83,11 @@ class FiniteElementsAnalysis:
         k[7, 0] = k[0, 7] = k[1, 2] = k[2, 1] = k[4,3] = k[3, 4] = k[6, 5] = k[5, 6] = lamda
 
         return E * self.thickness / (12 * (1 - self.poisson**2)) * k
-    
 
     def get_element_global_stiffness(self, element_dof, E):
         """
         For a given element (defined by its dofs) the method returns its global stiffness matrix
         """
-
         k_element_local = self.local_stiffness_matrix(E)
         self.k_element_glob = np.zeros((self.g_dofs, self.g_dofs))
         c1 = 0
@@ -104,7 +97,6 @@ class FiniteElementsAnalysis:
                 self.k_element_glob[i, j] = k_element_local[c1, c2]
                 c2 += 1
             c1 += 1
-
         return self.k_element_glob
 
     def get_global_stiffness(self, young_modulus):
@@ -139,7 +131,7 @@ class FiniteElementsAnalysis:
         # self.forces[-2] = -5 * load
         # self.forces[-int((2*self.n_elemX + 1) / 2) + 1] = -load  # the load is applied to the middle-point of the upper surface - direction to negative y
 
-    def get_displacements(self, flag=False):
+    def get_displacements(self, return_displ=False):
         """
         Returns the displacement field
         """
@@ -151,13 +143,12 @@ class FiniteElementsAnalysis:
         # Compute the displacement vector
         self.displacements = np.dot(np.linalg.inv(self.global_stiffness), self.forces)  # U = K^-1 * P
         self.displacements = self.displacements.reshape(self.n_elemY + 1, self.n_elemX + 1, 2)
-        if flag == False:
-            print(f"Displacement of the bottom right corner of the beam (m):\n{self.displacements[0][-1][1]}")
-        else:
+        if return_displ:
             return self.displacements[0][-1][1]
-
+        else:
+            print(f"\nDisplacement of the bottom right corner of the beam (m):\n{self.displacements[0][-1][1]}")
+            
     def mesh_plot(self):
-
         nx, ny = (self.n_elemX + 1, self.n_elemY + 1)
 
         x = np.linspace(0, self.lenX, nx)
@@ -184,13 +175,13 @@ class FiniteElementsAnalysis:
 
 
 if __name__ == '__main__':
-
-    fea = FiniteElementsAnalysis(n_elemX=40, n_elemY=10, lenX=4, lenY=1, poisson=0.3, thickness=0.2)
-
+    import arguments
+    
+    fea = FiniteElementsAnalysis(**arguments.shared_args)
     fea.rectangular_mesh()
     fea.get_dofs()
-    fea.get_global_stiffness(young_modulus=1e5)
+    fea.get_global_stiffness(young_modulus=arguments.determ_moduli)
     fea.set_boundary_conditions()
-    fea.set_force_vector(load=10)
+    fea.set_force_vector(load=arguments.determ_load)
     fea.get_displacements()
     fea.mesh_plot()
