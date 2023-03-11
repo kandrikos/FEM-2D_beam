@@ -35,12 +35,10 @@ class MonteCarloSimulation(FiniteElementsAnalysis):
             realization = E_kl[r]
             self.global_stiffness = np.zeros((self.g_dofs, self.g_dofs))
             for el, i in enumerate(itertools.cycle(range(len(realization)))):
-                
                 k_element_global = self.get_element_global_stiffness(element_dof=self.elem_dofs[el], E=realization[i])
                 self.global_stiffness += k_element_global
                 if el == self.elem_dofs.shape[0] - 1:
                     break
-            
             self.set_boundary_conditions()
             self.set_force_vector(load=loads[r])
             node_displacement = self.get_displacements(return_displ=True)
