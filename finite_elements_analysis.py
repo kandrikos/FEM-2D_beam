@@ -135,10 +135,10 @@ class FiniteElementsAnalysis:
         """
         Returns the displacement field
         """
-        for i in self.constrained_dofs:               # For each constrained dof i, set the elements of i-row & i-column
-            self.global_stiffness[:, i] = 0           # of the global stiffness matrix to zero
-            self.global_stiffness[i, :] = 0           # Assign a very large positive number to the i-diagonal element
-            self.global_stiffness[i, i] = 1e10
+        for i in self.constrained_dofs:               
+            self.global_stiffness[:, i] = 0           # For each constrained dof i, set the elements of i-row & i-column
+            self.global_stiffness[i, :] = 0           # of the global stiffness matrix to zero
+            self.global_stiffness[i, i] = 1e10        # Assign a very large positive number to the i-diagonal element
 
         # Compute the displacement vector
         self.displacements = np.dot(np.linalg.inv(self.global_stiffness), self.forces)  # U = K^-1 * P
