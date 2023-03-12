@@ -179,7 +179,7 @@ if __name__ == '__main__':
     fea = FiniteElementsAnalysis(**arguments.shared_args)
     fea.rectangular_mesh()
     fea.get_dofs()
-    fea.get_global_stiffness(young_modulus=arguments.determ_moduli)
+    fea.get_global_stiffness(young_modulus=arguments.determ_modulus)
     fea.set_boundary_conditions()
     fea.set_force_vector(load=arguments.determ_load)
     fea.get_displacements()
