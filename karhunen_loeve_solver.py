@@ -3,7 +3,7 @@ import sympy as sym
 from tqdm import tqdm
 import arguments
 '''
-Karhunen-Loeve series expansion. Implemantation of the method as explained in:
+Karhunen-Loeve series expansion. Implementation of the method as explained in:
 Vissarion Papadopoulos, Dimitris G. Giovanis. Stochastic Finite Element Methods-An Introduction,
 doi:10.1007/978-3-319-64528-5
 '''
