@@ -29,7 +29,7 @@ def eigen_analysis(KL_terms, l, b):
     return eig_val, eig_func
 
 def run_KL(M):
-    # M: number of realization
+    # M: number of realizations
     KL_terms = 6            # terms to retain in the Karhunen-Loeve series expansion
     l = arguments.shared_args['lenX'] # length of the stochastic field
     b = 3                   # autocorrelation length
