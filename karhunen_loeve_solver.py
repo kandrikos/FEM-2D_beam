@@ -38,7 +38,7 @@ def run_KL(M):
     eig_val, eig_func = eigen_analysis(KL_terms, l, b)
 
     E_kl = np.zeros((M, l*10))
-    E_mean = arguments.determ_moduli
+    E_mean = arguments.determ_modulus
     for i in tqdm(range(M), desc="Generating realizations"):
         ksi = 2*np.random.rand(KL_terms) - 1 # random variable
         for j in range(l*10):
