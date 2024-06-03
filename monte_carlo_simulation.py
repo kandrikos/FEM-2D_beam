@@ -30,8 +30,7 @@ class MonteCarloSimulation(FiniteElementsAnalysis):
         loads = self.get_load()
         self.rectangular_mesh()
         self.get_dofs()
-        print("\nRunning Finite Element Analysis for each realization ...")
-        for r in tqdm(range(len(E_kl))):
+        for r in tqdm(range(len(E_kl)), desc="Running Finite Element Analysis for each realization"):
             realization = E_kl[r]
             self.global_stiffness = np.zeros((self.g_dofs, self.g_dofs))
             for el, i in enumerate(itertools.cycle(range(len(realization)))):

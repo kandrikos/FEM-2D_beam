@@ -39,8 +39,7 @@ def run_KL(M):
 
     E_kl = np.zeros((M, l*10))
     E_mean = arguments.determ_moduli
-    print("Generating realizations ...")
-    for i in tqdm(range(M)):
+    for i in tqdm(range(M), desc="Generating realizations"):
         ksi = 2*np.random.rand(KL_terms) - 1 # random variable
         for j in range(l*10):
             for n in range(KL_terms):
